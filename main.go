@@ -8,6 +8,8 @@ import (
 
 	controllers "github.com/SohamRatnaparkhi/go-blog-server/controllers/server"
 
+	// "github.com/SohamRatnaparkhi/go-blog-server/internal/database"
+
 	"github.com/go-chi/chi"
 	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
@@ -17,10 +19,9 @@ func main() {
 	godotenv.Load(".env")
 	port := os.Getenv("PORT")
 	if port == "" {
-		panic("No port found")
+		log.Fatal("No port found")
 	}
 	router := chi.NewRouter()
-	v1Router := chi.NewRouter()
 
 	router.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"https://*", "http://*"},
@@ -31,9 +32,29 @@ func main() {
 		MaxAge:           300, // Maximum value not ignored by any of major browsers
 	}))
 
-	router.Mount("/v1", v1Router)
+	//Routers
 
-	v1Router.Get("/healthz", controllers.HealthCheck)
+	// database connection
+	// db_url := os.Getenv("DB_URL")
+	// if db_url == "" {
+	// 	panic("No database connection found")
+	// }
+
+	// db, dbErr := sql.Open("postgres", db_url)
+	// if dbErr != nil {
+	// 	panic("Failed to connect to database")
+	// }
+
+	// dbQueries := database.New(db)
+
+	// fmt.Print(dbQueries)
+
+	v1Router := chi.NewRouter()
+	router.Mount("/v1", v1Router)
+	v1Router.Get("/health", controllers.HealthCheck)
+
+	apiRouter := SetCompleteRouters()
+	v1Router.Mount("/users", apiRouter)
 
 	server := &http.Server{
 		Handler: router,
