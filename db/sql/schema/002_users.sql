@@ -2,7 +2,7 @@
 
 CREATE TABLE
     users (
-        id int NOT NULL,
+        id UUID NOT NULL,
         first_name VARCHAR(255) NOT NULL,
         last_name VARCHAR(255) NOT NULL,
         email VARCHAR(255) NOT NULL UNIQUE,

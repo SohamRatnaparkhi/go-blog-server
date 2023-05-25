@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/SohamRatnaparkhi/go-blog-server/db"
+	"github.com/google/uuid"
 
 	"github.com/SohamRatnaparkhi/go-blog-server/internal/database"
 	"github.com/SohamRatnaparkhi/go-blog-server/utils"
@@ -26,16 +27,25 @@ func HandleCreateUser(res http.ResponseWriter, req *http.Request) {
 		utils.ResponseJson(res, 400, struct {
 			Error string `json:"error"`
 		}{
-			Error: "Failed to create user",
+			Error: err.Error(),
 		})
 		return
 	}
 
-	apiConfig := db.DbClient
+	apiConfig, dbErr := db.DbInstance()
+	if dbErr != nil {
+		utils.ResponseJson(res, 400, struct {
+			Error string `json:"error"`
+		}{
+			Error: dbErr.Error(),
+		})
+		return
+	}
 
 	user, err := apiConfig.CreateUser(
 		req.Context(),
 		database.CreateUserParams{
+			ID:        uuid.New(),
 			FirstName: bodyDecoded.FirstName,
 			LastName:  bodyDecoded.LastName,
 			Email:     bodyDecoded.Email,
@@ -47,10 +57,12 @@ func HandleCreateUser(res http.ResponseWriter, req *http.Request) {
 		utils.ResponseJson(res, 400, struct {
 			Error string `json:"error"`
 		}{
-			Error: "Failed to create user",
+			Error: err.Error(),
 		})
 		return
+		// fmt.Println(err.Error())
+	} else {
+		utils.ResponseJson(res, 200, user)
 	}
 
-	utils.ResponseJson(res, 200, user)
 }

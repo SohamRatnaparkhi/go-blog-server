@@ -1,12 +1,14 @@
 package routes
 
 import (
+	"github.com/SohamRatnaparkhi/go-blog-server/controllers/server"
 	"github.com/SohamRatnaparkhi/go-blog-server/controllers/users"
 	"github.com/go-chi/chi"
 )
 
 func SetUserRouters() chi.Router {
 	var userRouter = chi.NewRouter()
-	userRouter.Post("/createUser", users.HandleCreateUser)
+	userRouter.Get("/", server.HealthCheck)
+	userRouter.Post("/create", users.HandleCreateUser)
 	return userRouter
 }

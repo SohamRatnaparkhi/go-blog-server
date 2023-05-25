@@ -8,8 +8,6 @@ import (
 
 	controllers "github.com/SohamRatnaparkhi/go-blog-server/controllers/server"
 
-	// "github.com/SohamRatnaparkhi/go-blog-server/internal/database"
-
 	"github.com/go-chi/chi"
 	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
@@ -54,14 +52,14 @@ func main() {
 	v1Router.Get("/health", controllers.HealthCheck)
 
 	apiRouter := SetCompleteRouters()
-	v1Router.Mount("/users", apiRouter)
+	v1Router.Mount("/api", apiRouter)
 
 	server := &http.Server{
 		Handler: router,
 		Addr:    ":" + port,
 	}
 
-	fmt.Printf("\nServer starting at http://localhost:%v", port)
+	fmt.Printf("\nServer starting at http://localhost:%v\n", port)
 
 	err := server.ListenAndServe()
 

@@ -7,6 +7,8 @@ package database
 import (
 	"database/sql"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type Post struct {
@@ -18,7 +20,7 @@ type Post struct {
 }
 
 type User struct {
-	ID        int32
+	ID        uuid.UUID
 	FirstName string
 	LastName  string
 	Email     string
