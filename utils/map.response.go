@@ -8,7 +8,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type DbUser struct {
+type DbUserFull struct {
 	ID        uuid.UUID      `json:"id"`
 	FirstName string         `json:"first_name"`
 	LastName  string         `json:"last_name"`
@@ -20,8 +20,8 @@ type DbUser struct {
 	UpdatedAt time.Time      `json:"updated_at"`
 }
 
-func MapUser(dbUser database.User) DbUser {
-	return DbUser{
+func MapRegisterUser(dbUser database.User) DbUserFull {
+	return DbUserFull{
 		ID:        dbUser.ID,
 		FirstName: dbUser.FirstName,
 		LastName:  dbUser.LastName,
@@ -31,5 +31,21 @@ func MapUser(dbUser database.User) DbUser {
 		Isadmin:   dbUser.Isadmin,
 		CreatedAt: dbUser.CreatedAt,
 		UpdatedAt: dbUser.UpdatedAt,
+	}
+}
+
+type DBUserResponse struct {
+	FirstName string         `json:"first_name"`
+	LastName  string         `json:"last_name"`
+	Email     string         `json:"email"`
+	Bio       sql.NullString `json:"bio"`
+}
+
+func MapLoginUser(dbUser database.GetUserByEmailRow) DBUserResponse {
+	return DBUserResponse{
+		FirstName: dbUser.FirstName,
+		LastName:  dbUser.LastName,
+		Email:     dbUser.Email,
+		Bio:       dbUser.Bio,
 	}
 }

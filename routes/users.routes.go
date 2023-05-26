@@ -10,5 +10,6 @@ func SetUserRouters() chi.Router {
 	var userRouter = chi.NewRouter()
 	userRouter.Get("/", server.HealthCheck)
 	userRouter.Post("/register", users.HandleRegisterUser)
+	userRouter.Post("/login", users.HandleLoginUser)
 	return userRouter
 }

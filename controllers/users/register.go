@@ -15,7 +15,7 @@ import (
 	"github.com/SohamRatnaparkhi/go-blog-server/utils"
 )
 
-func HandleRegisterUser(res http.ResponseWriter, req *http.Request) {
+func HandleRegisterUser(w http.ResponseWriter, req *http.Request) {
 	type reqBody struct {
 		FirstName string         `json:"first_name"`
 		LastName  string         `json:"last_name"`
@@ -28,7 +28,7 @@ func HandleRegisterUser(res http.ResponseWriter, req *http.Request) {
 	bodyDecoded := reqBody{}
 
 	if err := decoder.Decode(&bodyDecoded); err != nil {
-		utils.ResponseJson(res, 400, struct {
+		utils.ResponseJson(w, 400, struct {
 			Error string `json:"error"`
 		}{
 			Error: err.Error(),
@@ -38,33 +38,24 @@ func HandleRegisterUser(res http.ResponseWriter, req *http.Request) {
 
 	apiConfig, dbErr := db.DbInstance()
 	if dbErr != nil {
-		utils.ResponseJson(res, 400, struct {
-			Error string `json:"error"`
-		}{
-			Error: dbErr.Error(),
-		})
+		utils.ErrorResponse(w, http.StatusInternalServerError, dbErr)
 		return
 	}
 
 	saltValueString := os.Getenv("BCRYPT_SALT_VALUE")
 
-	saltValue, err := strconv.Atoi(saltValueString)
+	saltValue, bcryptErr := strconv.Atoi(saltValueString)
 
-	if err != nil {
-		utils.ResponseJson(res, 400, struct {
-			Error string `json:"error"`
-		}{
-			Error: err.Error(),
-		})
+	if bcryptErr != nil {
+		utils.ErrorResponse(w, http.StatusInternalServerError, bcryptErr)
 		return
 	}
-
 	hashedPassword, err2 := bcrypt.GenerateFromPassword([]byte(bodyDecoded.Password), saltValue)
 	if err2 != nil {
 		hashedPassword = []byte(bodyDecoded.Password)
 	}
 
-	user, err := apiConfig.CreateUser(
+	user, failedToAddToDb := apiConfig.CreateUser(
 		req.Context(),
 		database.CreateUserParams{
 			ID:        uuid.New(),
@@ -76,16 +67,27 @@ func HandleRegisterUser(res http.ResponseWriter, req *http.Request) {
 		},
 	)
 
-	if err != nil {
-		utils.ResponseJson(res, 400, struct {
-			Error string `json:"error"`
-		}{
-			Error: err.Error(),
-		})
+	if failedToAddToDb != nil {
+		utils.ErrorResponse(w, http.StatusInternalServerError, failedToAddToDb)
 		return
-		// fmt.Println(err.Error())
-	} else {
-		utils.ResponseJson(res, 200, utils.MapUser(user))
 	}
 
+	// create jwt token
+	token, expiryTime, jwtTokenError := utils.GetJwt(utils.Credentials{
+		Email:    bodyDecoded.Email,
+		Password: string(hashedPassword),
+	})
+
+	if jwtTokenError != nil {
+		utils.ErrorResponse(w, http.StatusUnauthorized, jwtTokenError)
+		return
+	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name:    "auth-token",
+		Value:   token,
+		Expires: expiryTime,
+	})
+
+	utils.ResponseJson(w, http.StatusCreated, utils.MapRegisterUser(user))
 }

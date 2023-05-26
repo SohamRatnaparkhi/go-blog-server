@@ -30,23 +30,6 @@ func main() {
 		MaxAge:           300, // Maximum value not ignored by any of major browsers
 	}))
 
-	//Routers
-
-	// database connection
-	// db_url := os.Getenv("DB_URL")
-	// if db_url == "" {
-	// 	panic("No database connection found")
-	// }
-
-	// db, dbErr := sql.Open("postgres", db_url)
-	// if dbErr != nil {
-	// 	panic("Failed to connect to database")
-	// }
-
-	// dbQueries := database.New(db)
-
-	// fmt.Print(dbQueries)
-
 	v1Router := chi.NewRouter()
 	router.Mount("/v1", v1Router)
 	v1Router.Get("/health", controllers.HealthCheck)
