@@ -19,17 +19,19 @@ INSERT INTO
         id,
         first_name,
         last_name,
+        password,
         email,
         bio
     )
-VALUES ($1, $2, $3, $4, $5)
-RETURNING id, first_name, last_name, email, bio, isadmin, created_at, updated_at
+VALUES ($1, $2, $3, $4, $5, $6)
+RETURNING id, first_name, last_name, email, bio, isadmin, created_at, updated_at, password
 `
 
 type CreateUserParams struct {
 	ID        uuid.UUID
 	FirstName string
 	LastName  string
+	Password  string
 	Email     string
 	Bio       sql.NullString
 }
@@ -39,6 +41,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		arg.ID,
 		arg.FirstName,
 		arg.LastName,
+		arg.Password,
 		arg.Email,
 		arg.Bio,
 	)
@@ -52,6 +55,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.Isadmin,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.Password,
 	)
 	return i, err
 }

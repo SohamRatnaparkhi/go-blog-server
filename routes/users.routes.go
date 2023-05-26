@@ -9,6 +9,6 @@ import (
 func SetUserRouters() chi.Router {
 	var userRouter = chi.NewRouter()
 	userRouter.Get("/", server.HealthCheck)
-	userRouter.Post("/create", users.HandleCreateUser)
+	userRouter.Post("/register", users.HandleRegisterUser)
 	return userRouter
 }

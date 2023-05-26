@@ -28,4 +28,5 @@ type User struct {
 	Isadmin   bool
 	CreatedAt time.Time
 	UpdatedAt time.Time
+	Password  string
 }
