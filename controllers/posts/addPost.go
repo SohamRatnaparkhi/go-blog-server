@@ -8,6 +8,7 @@ import (
 	"github.com/SohamRatnaparkhi/go-blog-server/db"
 	"github.com/SohamRatnaparkhi/go-blog-server/internal/database"
 	"github.com/SohamRatnaparkhi/go-blog-server/utils"
+	"github.com/google/uuid"
 )
 
 func CreatePostHandler(w http.ResponseWriter, req *http.Request, user database.GetUserByEmailRow) {
@@ -28,10 +29,23 @@ func CreatePostHandler(w http.ResponseWriter, req *http.Request, user database.G
 		})
 		return
 	}
-
 	apiConfig, dbErr := db.DbInstance()
 	if dbErr != nil {
 		utils.ErrorResponse(w, http.StatusInternalServerError, dbErr)
 		return
 	}
+
+	post, dbErr2 := apiConfig.CreatePost(req.Context(), database.CreatePostParams{
+		ID:       uuid.New(),
+		Title:    bodyDecoded.Title,
+		Body:     bodyDecoded.Body,
+		AuthorID: user.ID,
+	})
+
+	if dbErr2 != nil {
+		utils.ErrorResponse(w, http.StatusInternalServerError, dbErr2)
+		return
+	}
+
+	utils.ResponseJson(w, http.StatusOK, utils.MapPost(post))
 }
