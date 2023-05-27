@@ -131,39 +131,6 @@ func (q *Queries) ViewAllPostsByPage(ctx context.Context, arg ViewAllPostsByPage
 	return items, nil
 }
 
-const viewPostByAuthor = `-- name: ViewPostByAuthor :one
-
-SELECT id, title, body, author_id, url, tags, created_at, updated_at, views
-FROM post
-WHERE author_id = $1
-ORDER BY created_at DESC
-LIMIT $2
-OFFSET $3
-`
-
-type ViewPostByAuthorParams struct {
-	AuthorID uuid.UUID
-	Limit    int32
-	Offset   int32
-}
-
-func (q *Queries) ViewPostByAuthor(ctx context.Context, arg ViewPostByAuthorParams) (Post, error) {
-	row := q.db.QueryRowContext(ctx, viewPostByAuthor, arg.AuthorID, arg.Limit, arg.Offset)
-	var i Post
-	err := row.Scan(
-		&i.ID,
-		&i.Title,
-		&i.Body,
-		&i.AuthorID,
-		&i.Url,
-		pq.Array(&i.Tags),
-		&i.CreatedAt,
-		&i.UpdatedAt,
-		&i.Views,
-	)
-	return i, err
-}
-
 const viewPostByID = `-- name: ViewPostByID :one
 
 SELECT id, title, body, author_id, url, tags, created_at, updated_at, views FROM post WHERE id = $1
@@ -184,4 +151,53 @@ func (q *Queries) ViewPostByID(ctx context.Context, id uuid.UUID) (Post, error) 
 		&i.Views,
 	)
 	return i, err
+}
+
+const viewPostsByAuthor = `-- name: ViewPostsByAuthor :many
+
+SELECT id, title, body, author_id, url, tags, created_at, updated_at, views
+FROM post
+WHERE author_id = $1
+ORDER BY created_at DESC
+LIMIT $2
+OFFSET $3
+`
+
+type ViewPostsByAuthorParams struct {
+	AuthorID uuid.UUID
+	Limit    int32
+	Offset   int32
+}
+
+func (q *Queries) ViewPostsByAuthor(ctx context.Context, arg ViewPostsByAuthorParams) ([]Post, error) {
+	rows, err := q.db.QueryContext(ctx, viewPostsByAuthor, arg.AuthorID, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Post
+	for rows.Next() {
+		var i Post
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.Body,
+			&i.AuthorID,
+			&i.Url,
+			pq.Array(&i.Tags),
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.Views,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
