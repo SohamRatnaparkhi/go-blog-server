@@ -20,6 +20,7 @@ type Post struct {
 	Tags      []string
 	CreatedAt time.Time
 	UpdatedAt time.Time
+	Views     int32
 }
 
 type User struct {
