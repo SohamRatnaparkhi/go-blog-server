@@ -2,9 +2,7 @@ package users
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/SohamRatnaparkhi/go-blog-server/db"
 	"golang.org/x/crypto/bcrypt"
@@ -46,8 +44,8 @@ func HandleLoginUser(w http.ResponseWriter, req *http.Request) {
 	}
 
 	jwtToken, expiryTime, tokenErr := utils.GetJwt(utils.Credentials{
-		Email:    user.Email,
-		Password: user.Password,
+		Email: user.Email,
+		Name:  user.FirstName + user.LastName,
 	})
 
 	if tokenErr != nil {
@@ -56,12 +54,12 @@ func HandleLoginUser(w http.ResponseWriter, req *http.Request) {
 	}
 
 	http.SetCookie(w, &http.Cookie{
-		Name:    "auth-token",
+		Name:    "auth_token",
 		Value:   jwtToken,
 		Expires: expiryTime,
 	})
 
-	go utils.SendMail(user.Email, fmt.Sprintf("Some on logged in to your account at %v", time.Now()), "Login Verification")
+	// go utils.SendMail(user.Email, fmt.Sprintf("Some on logged in to your account at %v", time.Now()), "Login Verification")
 
 	utils.ResponseJson(w, http.StatusOK, utils.MapLoginUser(user))
 }

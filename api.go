@@ -10,9 +10,13 @@ import (
 func SetCompleteRouters() chi.Router {
 	apiRouter := chi.NewRouter()
 
-	userRouter := router.SetUserRouters()
 	apiRouter.Get("/", controllers.HealthCheck)
+
+	userRouter := router.SetUserRouters()
 	apiRouter.Mount("/users", userRouter)
+
+	postsRouter := router.SetPostsRouters()
+	apiRouter.Mount("/posts", postsRouter)
 
 	return apiRouter
 }

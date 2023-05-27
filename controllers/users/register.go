@@ -74,8 +74,8 @@ func HandleRegisterUser(w http.ResponseWriter, req *http.Request) {
 
 	// create jwt token
 	token, expiryTime, jwtTokenError := utils.GetJwt(utils.Credentials{
-		Email:    bodyDecoded.Email,
-		Password: string(hashedPassword),
+		Email: bodyDecoded.Email,
+		Name:  user.FirstName + user.LastName,
 	})
 
 	if jwtTokenError != nil {
@@ -84,7 +84,7 @@ func HandleRegisterUser(w http.ResponseWriter, req *http.Request) {
 	}
 
 	http.SetCookie(w, &http.Cookie{
-		Name:    "auth-token",
+		Name:    "auth_token",
 		Value:   token,
 		Expires: expiryTime,
 	})

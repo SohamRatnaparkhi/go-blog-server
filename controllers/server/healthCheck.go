@@ -6,7 +6,7 @@ import (
 	"github.com/SohamRatnaparkhi/go-blog-server/utils"
 )
 
-func HealthCheck(res http.ResponseWriter, req *http.Request) {
+func HealthCheck(res http.ResponseWriter, _ *http.Request) {
 	type resp struct {
 		Status string `json:"status"`
 	}

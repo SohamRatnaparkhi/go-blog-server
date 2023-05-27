@@ -6,24 +6,26 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/joho/godotenv"
 )
 
 type Credentials struct {
-	Email    string
-	Password string
+	Email string
+	Name  string
+	// Password string
 }
 
 type Claims struct {
-	creds Credentials
+	Creds Credentials
 	jwt.RegisteredClaims
 }
 
-var jwtKey string = os.Getenv("JWT_SECRET_KEY")
-
 func GetJwt(signerClaims Credentials) (tokenString string, expireTime time.Time, err error) {
-	expiryTime := time.Now().Add(5 * time.Minute)
+	godotenv.Load()
+	var jwtKey string = os.Getenv("JWT_SECRET_KEY")
+	expiryTime := time.Now().Add(50 * time.Minute)
 	claims := Claims{
-		creds: signerClaims,
+		Creds: signerClaims,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expiryTime),
 		},
@@ -36,7 +38,9 @@ func GetJwt(signerClaims Credentials) (tokenString string, expireTime time.Time,
 }
 
 func Refresh(w http.ResponseWriter, r *http.Request) {
-	c, err := r.Cookie("auth-token")
+	godotenv.Load()
+	var jwtKey string = os.Getenv("JWT_SECRET_KEY")
+	c, err := r.Cookie("auth_token")
 	if err != nil {
 		if err == http.ErrNoCookie {
 			w.WriteHeader(http.StatusUnauthorized)
@@ -83,7 +87,7 @@ func Refresh(w http.ResponseWriter, r *http.Request) {
 
 	// Set the new token as the users `token` cookie
 	http.SetCookie(w, &http.Cookie{
-		Name:    "auth-token",
+		Name:    "auth_token",
 		Value:   tokenString,
 		Expires: expirationTime,
 	})
