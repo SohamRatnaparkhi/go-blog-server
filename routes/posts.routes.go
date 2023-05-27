@@ -8,8 +8,11 @@ import (
 )
 
 func SetPostsRouters() chi.Router {
-	var userRouter = chi.NewRouter()
-	userRouter.Get("/", server.HealthCheck)
-	userRouter.Get("/create", middleware.Auth(middleware.AuthHandler(posts.CreatePostHandler)))
-	return userRouter
+	var postRouter = chi.NewRouter()
+	postRouter.Get("/", server.HealthCheck)
+	postRouter.Post("/create", middleware.Auth(middleware.AuthHandler(posts.CreatePostHandler)))
+	postRouter.Get("/getAll", middleware.Auth(middleware.AuthHandler(posts.GetAllPosts)))
+	postRouter.Get("/getByAuthor", middleware.Auth(middleware.AuthHandler(posts.GetPostsByAuthor)))
+	postRouter.Get("/getById", middleware.Auth(middleware.AuthHandler(posts.GetPostById)))
+	return postRouter
 }
