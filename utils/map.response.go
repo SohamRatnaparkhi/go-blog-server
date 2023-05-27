@@ -35,6 +35,7 @@ func MapRegisterUser(dbUser database.User) DbUserFull {
 }
 
 type DBUserResponse struct {
+	ID        uuid.UUID      `json:"id"`
 	FirstName string         `json:"first_name"`
 	LastName  string         `json:"last_name"`
 	Email     string         `json:"email"`
@@ -43,6 +44,7 @@ type DBUserResponse struct {
 
 func MapLoginUser(dbUser database.GetUserByEmailRow) DBUserResponse {
 	return DBUserResponse{
+		ID:        dbUser.ID,
 		FirstName: dbUser.FirstName,
 		LastName:  dbUser.LastName,
 		Email:     dbUser.Email,

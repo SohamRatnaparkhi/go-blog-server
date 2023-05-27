@@ -12,9 +12,12 @@ import (
 )
 
 type Post struct {
-	ID        int32
+	ID        uuid.UUID
 	Title     sql.NullString
 	Body      sql.NullString
+	AuthorID  uuid.UUID
+	Url       sql.NullString
+	Tags      []string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
