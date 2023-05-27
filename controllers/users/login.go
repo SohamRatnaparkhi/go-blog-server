@@ -2,7 +2,9 @@ package users
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/SohamRatnaparkhi/go-blog-server/db"
 	"golang.org/x/crypto/bcrypt"
@@ -58,6 +60,8 @@ func HandleLoginUser(w http.ResponseWriter, req *http.Request) {
 		Value:   jwtToken,
 		Expires: expiryTime,
 	})
+
+	go utils.SendMail(user.Email, fmt.Sprintf("Some on logged in to your account at %v", time.Now()), "Login Verification")
 
 	utils.ResponseJson(w, http.StatusOK, utils.MapLoginUser(user))
 }
