@@ -43,5 +43,21 @@ func HandleLoginUser(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	jwtToken, expiryTime, tokenErr := utils.GetJwt(utils.Credentials{
+		Email:    user.Email,
+		Password: user.Password,
+	})
+
+	if tokenErr != nil {
+		utils.ErrorResponse(w, http.StatusForbidden, tokenErr)
+		return
+	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name:    "auth-token",
+		Value:   jwtToken,
+		Expires: expiryTime,
+	})
+
 	utils.ResponseJson(w, http.StatusOK, utils.MapLoginUser(user))
 }
