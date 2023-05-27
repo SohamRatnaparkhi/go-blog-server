@@ -15,6 +15,7 @@ RETURNING *;
 -- name: GetUser :one
 
 SELECT
+    id,
     first_name,
     last_name,
     email,
@@ -25,6 +26,7 @@ WHERE email = $1 AND password = $2;
 -- name: GetUserByEmail :one
 
 SELECT
+    id,
     email,
     password,
     first_name,

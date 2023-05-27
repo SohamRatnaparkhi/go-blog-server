@@ -63,6 +63,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 const getUser = `-- name: GetUser :one
 
 SELECT
+    id,
     first_name,
     last_name,
     email,
@@ -77,6 +78,7 @@ type GetUserParams struct {
 }
 
 type GetUserRow struct {
+	ID        uuid.UUID
 	FirstName string
 	LastName  string
 	Email     string
@@ -87,6 +89,7 @@ func (q *Queries) GetUser(ctx context.Context, arg GetUserParams) (GetUserRow, e
 	row := q.db.QueryRowContext(ctx, getUser, arg.Email, arg.Password)
 	var i GetUserRow
 	err := row.Scan(
+		&i.ID,
 		&i.FirstName,
 		&i.LastName,
 		&i.Email,
@@ -98,6 +101,7 @@ func (q *Queries) GetUser(ctx context.Context, arg GetUserParams) (GetUserRow, e
 const getUserByEmail = `-- name: GetUserByEmail :one
 
 SELECT
+    id,
     email,
     password,
     first_name,
@@ -108,6 +112,7 @@ WHERE email = $1
 `
 
 type GetUserByEmailRow struct {
+	ID        uuid.UUID
 	Email     string
 	Password  string
 	FirstName string
@@ -119,6 +124,7 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (GetUserByEm
 	row := q.db.QueryRowContext(ctx, getUserByEmail, email)
 	var i GetUserByEmailRow
 	err := row.Scan(
+		&i.ID,
 		&i.Email,
 		&i.Password,
 		&i.FirstName,
