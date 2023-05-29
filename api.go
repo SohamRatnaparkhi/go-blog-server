@@ -1,7 +1,7 @@
 package main
 
 import (
-	controllers "github.com/SohamRatnaparkhi/go-blog-server/controllers/server"
+	handlers "github.com/SohamRatnaparkhi/go-blog-server/handlers/server"
 	router "github.com/SohamRatnaparkhi/go-blog-server/routes"
 
 	"github.com/go-chi/chi"
@@ -10,7 +10,7 @@ import (
 func SetCompleteRouters() chi.Router {
 	apiRouter := chi.NewRouter()
 
-	apiRouter.Get("/", controllers.HealthCheck)
+	apiRouter.Get("/", handlers.HealthCheck)
 
 	userRouter := router.SetUserRouters()
 	apiRouter.Mount("/users", userRouter)

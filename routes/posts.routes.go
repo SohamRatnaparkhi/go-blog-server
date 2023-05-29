@@ -1,8 +1,8 @@
 package routes
 
 import (
-	"github.com/SohamRatnaparkhi/go-blog-server/controllers/posts"
-	"github.com/SohamRatnaparkhi/go-blog-server/controllers/server"
+	"github.com/SohamRatnaparkhi/go-blog-server/handlers/posts"
+	"github.com/SohamRatnaparkhi/go-blog-server/handlers/server"
 	"github.com/SohamRatnaparkhi/go-blog-server/middleware"
 	"github.com/go-chi/chi"
 )

@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"os"
 
-	controllers "github.com/SohamRatnaparkhi/go-blog-server/controllers/server"
+	controllers "github.com/SohamRatnaparkhi/go-blog-server/handlers/server"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/cors"
