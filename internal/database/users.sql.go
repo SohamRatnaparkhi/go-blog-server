@@ -24,7 +24,7 @@ INSERT INTO
         bio
     )
 VALUES ($1, $2, $3, $4, $5, $6)
-RETURNING id, first_name, last_name, email, bio, isadmin, created_at, updated_at, password
+RETURNING id, first_name, last_name, email, bio, isadmin, created_at, updated_at, password, followers, following
 `
 
 type CreateUserParams struct {
@@ -56,6 +56,8 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.Password,
+		&i.Followers,
+		&i.Following,
 	)
 	return i, err
 }

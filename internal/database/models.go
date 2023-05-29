@@ -21,6 +21,7 @@ type Post struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	Views     int32
+	Likes     int32
 }
 
 type User struct {
@@ -33,4 +34,6 @@ type User struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	Password  string
+	Followers sql.NullInt32
+	Following sql.NullInt32
 }

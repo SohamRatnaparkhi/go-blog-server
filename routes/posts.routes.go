@@ -14,5 +14,7 @@ func SetPostsRouters() chi.Router {
 	postRouter.Get("/getAll", middleware.Auth(middleware.AuthHandler(posts.GetAllPosts)))
 	postRouter.Get("/getByAuthor", middleware.Auth(middleware.AuthHandler(posts.GetPostsByAuthor)))
 	postRouter.Get("/getById", middleware.Auth(middleware.AuthHandler(posts.GetPostById)))
+	postRouter.Get("/likePost", middleware.Auth(middleware.AuthHandler(posts.LikePost)))
+	postRouter.Get("/dislikePost", middleware.Auth(middleware.AuthHandler(posts.DislikePost)))
 	return postRouter
 }

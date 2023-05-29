@@ -15,6 +15,7 @@ type PostMap struct {
 	Url      sql.NullString `json:"url"`
 	Tags     []string       `json:"tags"`
 	Views    int32          `json:"views"`
+	Likes    int32          `json:"likes"`
 }
 
 func MapPost(post database.Post) PostMap {
@@ -26,5 +27,6 @@ func MapPost(post database.Post) PostMap {
 		Url:      post.Url,
 		Tags:     post.Tags,
 		Views:    post.Views,
+		Likes:    post.Likes,
 	}
 }

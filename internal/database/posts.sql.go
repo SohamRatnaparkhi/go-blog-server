@@ -17,8 +17,7 @@ const createPost = `-- name: CreatePost :one
 
 INSERT INTO
     post (id, title, body, author_id)
-VALUES ($1, $2, $3, $4)
-RETURNING id, title, body, author_id, url, tags, created_at, updated_at, views
+VALUES ($1, $2, $3, $4) RETURNING id, title, body, author_id, url, tags, created_at, updated_at, views, likes
 `
 
 type CreatePostParams struct {
@@ -46,13 +45,85 @@ func (q *Queries) CreatePost(ctx context.Context, arg CreatePostParams) (Post, e
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.Views,
+		&i.Likes,
+	)
+	return i, err
+}
+
+const decreaseLikes = `-- name: DecreaseLikes :one
+
+UPDATE post SET likes = likes - 1 WHERE id = $1 RETURNING id, title, body, author_id, url, tags, created_at, updated_at, views, likes
+`
+
+func (q *Queries) DecreaseLikes(ctx context.Context, id uuid.UUID) (Post, error) {
+	row := q.db.QueryRowContext(ctx, decreaseLikes, id)
+	var i Post
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.Body,
+		&i.AuthorID,
+		&i.Url,
+		pq.Array(&i.Tags),
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Views,
+		&i.Likes,
+	)
+	return i, err
+}
+
+const increaseLikes = `-- name: IncreaseLikes :one
+
+UPDATE post SET likes = likes + 1 WHERE id = $1 RETURNING id, title, body, author_id, url, tags, created_at, updated_at, views, likes
+`
+
+func (q *Queries) IncreaseLikes(ctx context.Context, id uuid.UUID) (Post, error) {
+	row := q.db.QueryRowContext(ctx, increaseLikes, id)
+	var i Post
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.Body,
+		&i.AuthorID,
+		&i.Url,
+		pq.Array(&i.Tags),
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Views,
+		&i.Likes,
+	)
+	return i, err
+}
+
+const updateViewCount = `-- name: UpdateViewCount :one
+
+UPDATE post
+SET view_count = view_count + 1
+WHERE id = $1 RETURNING id, title, body, author_id, url, tags, created_at, updated_at, views, likes
+`
+
+func (q *Queries) UpdateViewCount(ctx context.Context, id uuid.UUID) (Post, error) {
+	row := q.db.QueryRowContext(ctx, updateViewCount, id)
+	var i Post
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.Body,
+		&i.AuthorID,
+		&i.Url,
+		pq.Array(&i.Tags),
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Views,
+		&i.Likes,
 	)
 	return i, err
 }
 
 const viewAllPosts = `-- name: ViewAllPosts :many
 
-SELECT id, title, body, author_id, url, tags, created_at, updated_at, views FROM post ORDER BY created_at DESC
+SELECT id, title, body, author_id, url, tags, created_at, updated_at, views, likes FROM post ORDER BY created_at DESC
 `
 
 func (q *Queries) ViewAllPosts(ctx context.Context) ([]Post, error) {
@@ -74,6 +145,7 @@ func (q *Queries) ViewAllPosts(ctx context.Context) ([]Post, error) {
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.Views,
+			&i.Likes,
 		); err != nil {
 			return nil, err
 		}
@@ -90,7 +162,7 @@ func (q *Queries) ViewAllPosts(ctx context.Context) ([]Post, error) {
 
 const viewAllPostsByPage = `-- name: ViewAllPostsByPage :many
 
-SELECT id, title, body, author_id, url, tags, created_at, updated_at, views FROM post ORDER BY created_at DESC LIMIT $1 OFFSET $2
+SELECT id, title, body, author_id, url, tags, created_at, updated_at, views, likes FROM post ORDER BY created_at DESC LIMIT $1 OFFSET $2
 `
 
 type ViewAllPostsByPageParams struct {
@@ -117,6 +189,7 @@ func (q *Queries) ViewAllPostsByPage(ctx context.Context, arg ViewAllPostsByPage
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.Views,
+			&i.Likes,
 		); err != nil {
 			return nil, err
 		}
@@ -133,7 +206,7 @@ func (q *Queries) ViewAllPostsByPage(ctx context.Context, arg ViewAllPostsByPage
 
 const viewPostByID = `-- name: ViewPostByID :one
 
-SELECT id, title, body, author_id, url, tags, created_at, updated_at, views FROM post WHERE id = $1
+SELECT id, title, body, author_id, url, tags, created_at, updated_at, views, likes FROM post WHERE id = $1
 `
 
 func (q *Queries) ViewPostByID(ctx context.Context, id uuid.UUID) (Post, error) {
@@ -149,13 +222,14 @@ func (q *Queries) ViewPostByID(ctx context.Context, id uuid.UUID) (Post, error) 
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.Views,
+		&i.Likes,
 	)
 	return i, err
 }
 
 const viewPostsByAuthor = `-- name: ViewPostsByAuthor :many
 
-SELECT id, title, body, author_id, url, tags, created_at, updated_at, views
+SELECT id, title, body, author_id, url, tags, created_at, updated_at, views, likes
 FROM post
 WHERE author_id = $1
 ORDER BY created_at DESC
@@ -188,6 +262,7 @@ func (q *Queries) ViewPostsByAuthor(ctx context.Context, arg ViewPostsByAuthorPa
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.Views,
+			&i.Likes,
 		); err != nil {
 			return nil, err
 		}

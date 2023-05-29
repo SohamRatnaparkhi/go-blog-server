@@ -25,7 +25,7 @@ func GetPostsByAuthor(w http.ResponseWriter, req *http.Request, user database.Ge
 	authorPosts, dbErr2 := apiConfig.ViewPostsByAuthor(req.Context(), database.ViewPostsByAuthorParams{
 		AuthorID: user.ID,
 		Limit:    int32(LIMIT),
-		Offset:   int32(offset) * int32(LIMIT),
+		Offset:   int32(offset-1) * int32(LIMIT),
 	})
 	if dbErr2 != nil {
 		utils.ErrorResponse(w, http.StatusInternalServerError, dbErr2)
