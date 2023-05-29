@@ -19,10 +19,12 @@ func LikePost(w http.ResponseWriter, req *http.Request, _ database.GetUserByEmai
 	post_uuid, parseErr := uuid.Parse(post_id)
 	if parseErr != nil {
 		utils.ErrorResponse(w, http.StatusInternalServerError, parseErr)
+		return
 	}
 	post, err := apiConfig.IncreaseLikes(req.Context(), post_uuid)
 	if err != nil {
 		utils.ErrorResponse(w, http.StatusInternalServerError, err)
+		return
 	}
 	utils.ResponseJson(w, http.StatusOK, utils.MapPost(post))
 }
@@ -37,10 +39,12 @@ func DislikePost(w http.ResponseWriter, req *http.Request, _ database.GetUserByE
 	post_uuid, parseErr := uuid.Parse(post_id)
 	if parseErr != nil {
 		utils.ErrorResponse(w, http.StatusInternalServerError, parseErr)
+		return
 	}
 	post, err := apiConfig.DecreaseLikes(req.Context(), post_uuid)
 	if err != nil {
 		utils.ErrorResponse(w, http.StatusInternalServerError, err)
+		return
 	}
 	utils.ResponseJson(w, http.StatusOK, utils.MapPost(post))
 }
